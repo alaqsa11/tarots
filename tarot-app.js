@@ -10,6 +10,7 @@ let currentSpread = null;
 let drawnCards = [];
 let selectedCardIndex = null;
 let revealedFanCard = null;
+let fanBusy = false;
 
 function getAllCards() {
   const all = [];
@@ -491,48 +492,52 @@ function drawFan() {
 }
 
 function revealFanCard(card, cardData) {
-  if (card.classList.contains('flipped') || card.classList.contains('reversed')) return;
+  if (fanBusy) return;
+  if (card.classList.contains('revealed')) return;
+  if (revealedFanCard) return;
 
+  fanBusy = true;
   const container = card.parentElement;
-
-  // Se c'e' gia' una carta rivelata diversa da questa, la rimette nel mazzo
-  if (revealedFanCard && revealedFanCard !== card) {
-    const prev = revealedFanCard;
-    prev.classList.remove('revealed', 'flipped', 'reversed');
-    prev.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), left 0.8s cubic-bezier(0.4, 0, 0.2, 1), top 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-    prev.style.left = prev.dataset.origLeft;
-    prev.style.top = prev.dataset.origTop;
-    prev.style.transform = `rotate(${prev.dataset.theta}deg)`;
-    prev.style.zIndex = prev.dataset.zIndex;
-    prev.classList.remove('revealed');
-  }
-
-  container.classList.add('has-revealed');
+  if (!container) { fanBusy = false; return; }
 
   const W = container.clientWidth;
   const H = container.clientHeight;
+  const others = [...container.querySelectorAll('.fan-card')].filter(c => c !== card);
 
+  others.forEach((c, idx) => {
+    c.style.pointerEvents = 'none';
+    c.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), left 0.7s cubic-bezier(0.4, 0, 0.2, 1), top 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.7s ease';
+    const delay = Math.min(idx * 8, 120);
+    c.style.transitionDelay = delay + 'ms';
+    c.style.left = (W / 2 - c.offsetWidth / 2) + 'px';
+    c.style.top = (H / 2 - c.offsetHeight / 2) + 'px';
+    c.style.transform = 'rotate(0deg) scale(0.3)';
+    c.style.opacity = '0';
+  });
+
+  container.classList.add('has-revealed');
   card.classList.add('revealed');
-
   card.style.transition = 'transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), left 1.2s cubic-bezier(0.4, 0, 0.2, 1), top 1.2s cubic-bezier(0.4, 0, 0.2, 1)';
+  card.style.transitionDelay = '0ms';
   card.style.left = (W / 2 - card.offsetWidth / 2) + 'px';
   card.style.top = (H / 2 - card.offsetHeight / 2) + 'px';
   card.style.transform = 'rotateY(720deg) scale(1.1)';
-  card.style.zIndex = 999;
+  card.style.zIndex = '999';
 
   revealedFanCard = card;
 
-  // Nasconde il risultato precedente finche' non finisce la nuova animazione
   const result = document.getElementById('fan-result');
   if (result) result.classList.add('hidden');
 
   setTimeout(() => {
+    others.forEach(c => c.remove());
     if (cardData.isReversed) {
       card.classList.add('reversed');
     } else {
       card.classList.add('flipped');
     }
     showFanResult(cardData);
+    fanBusy = false;
   }, 1200);
 }
 
