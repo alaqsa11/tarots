@@ -430,23 +430,9 @@ function drawFan() {
   const R_outer = Math.min(cy - cardH * 0.55, W * 0.42);
   const R_inner = R_outer * 0.68;
 
-  // Recupera le carte correnti (se c'e' una carta gia' rivelata)
-  let cards;
-  if (revealedFanCard && revealedFanCard.parentElement) {
-    const prevName = revealedFanCard.dataset.cardName;
-    const all = shuffleDeck(getAllCards());
-    // Mescola il mazzo e re-inserisce la carta precedente
-    // Per semplicita', rifacciamo il mazzo da zero e rimettiamo la carta precedente in fondo
-    const prevData = all.find(c => c.name === prevName);
-    if (prevData) {
-      all.splice(all.indexOf(prevData), 1);
-      const insertPos = Math.floor(Math.random() * (all.length + 1));
-      all.splice(insertPos, 0, prevData);
-    }
-    cards = shuffleDeck(all); // Rimescola tutto
-  } else {
-    cards = shuffleDeck(getAllCards());
-  }
+  revealedFanCard = null;
+  fanBusy = false;
+  const cards = shuffleDeck(getAllCards());
 
   function placeOnRing(card, i, n, R, zBase) {
     const t = n > 1 ? i / (n - 1) : 0.5;
@@ -477,7 +463,13 @@ function drawFan() {
     card.dataset.ring = 'outer';
     container.appendChild(card);
     placeOnRing(card, i, outerN, R_outer, 1);
-    card.addEventListener('click', () => revealFanCard(card, cardData));
+    card.addEventListener('click', () => {
+      if (card.classList.contains('revealed')) {
+        returnFanToDeck();
+        return;
+      }
+      revealFanCard(card, cardData);
+    });
   });
 
   cards.slice(outerN).forEach((cardData, i) => {
@@ -485,15 +477,18 @@ function drawFan() {
     card.dataset.ring = 'inner';
     container.appendChild(card);
     placeOnRing(card, i, innerN, R_inner, 2000);
-    card.addEventListener('click', () => revealFanCard(card, cardData));
+    card.addEventListener('click', () => {
+      if (card.classList.contains('revealed')) {
+        returnFanToDeck();
+        return;
+      }
+      revealFanCard(card, cardData);
+    });
   });
-
-  revealedFanCard = null;
 }
 
 function revealFanCard(card, cardData) {
   if (fanBusy) return;
-  if (card.classList.contains('revealed')) return;
   if (revealedFanCard) return;
 
   fanBusy = true;
@@ -564,8 +559,43 @@ function showFanResult(cardData) {
   result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
+function returnFanToDeck() {
+  if (fanBusy) return;
+  if (!revealedFanCard) {
+    drawFan();
+    return;
+  }
+
+  fanBusy = true;
+  const card = revealedFanCard;
+  const container = document.getElementById('fan-container');
+  const result = document.getElementById('fan-result');
+
+  if (result && !result.classList.contains('hidden')) {
+    result.classList.add('is-fading');
+  }
+
+  card.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), left 0.8s cubic-bezier(0.4, 0, 0.2, 1), top 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease';
+  card.style.left = card.dataset.origLeft || card.style.left;
+  card.style.top = card.dataset.origTop || card.style.top;
+  card.style.transform = `rotate(${card.dataset.theta || 0}deg) scale(0.5)`;
+  card.style.opacity = '0';
+
+  setTimeout(() => {
+    if (result) {
+      result.classList.add('hidden');
+      result.classList.remove('is-fading');
+      result.style.opacity = '';
+    }
+    revealedFanCard = null;
+    fanBusy = false;
+    if (container) container.classList.remove('has-revealed');
+    drawFan();
+  }, 850);
+}
+
 function resetFan() {
-  drawFan();
+  returnFanToDeck();
 }
 
 drawFan();
@@ -573,7 +603,7 @@ drawFan();
 window.addEventListener('resize', () => {
   const container = document.getElementById('fan-container');
   if (!container) return;
-  if (!container.querySelector('.fan-card.revealed')) {
-    drawFan();
-  }
+  if (fanBusy) return;
+  if (revealedFanCard) return;
+  drawFan();
 });
