@@ -419,8 +419,22 @@ function drawFan() {
 
   const W = container.clientWidth;
   const H = container.clientHeight;
-  const cardW = 76;
-  const cardH = 118;
+
+  const cards = shuffleDeck(getAllCards()).map(card => ({
+    ...card,
+    isReversed: Math.random() < 0.5
+  }));
+
+  const probe = buildFanCard(cards[0]);
+  probe.style.visibility = 'hidden';
+  probe.style.pointerEvents = 'none';
+  probe.style.left = '0';
+  probe.style.top = '0';
+  container.appendChild(probe);
+  const cardW = probe.offsetWidth;
+  const cardH = probe.offsetHeight;
+  probe.remove();
+
   const cx = W / 2;
   // Centro del ventaglio: sotto il punto piu alto delle carte, condiviso da entrambi gli anelli
   const cy = H * 0.78;
@@ -432,7 +446,6 @@ function drawFan() {
 
   revealedFanCard = null;
   fanBusy = false;
-  const cards = shuffleDeck(getAllCards());
 
   function placeOnRing(card, i, n, R, zBase) {
     const t = n > 1 ? i / (n - 1) : 0.5;
