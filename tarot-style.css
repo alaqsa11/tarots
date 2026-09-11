@@ -365,7 +365,7 @@ section > p {
 }
 
 .spread-card {
-  background: var(--paper);
+  background: var(--paper-deep);
   border: 1px solid rgba(18, 16, 14, 0.2);
   border-radius: 4px;
   padding: 2rem;
@@ -719,19 +719,19 @@ section > p {
 }
 
 .interp-badge {
-  background: var(--paper);
-  color: var(--ink);
   border: 1px solid var(--ink);
   border-radius: 0;
+  font-family: var(--font-body);
+  background: #f7f1e6;
+  color: var(--ink);
   padding: 0.3rem 0.9rem;
   font-size: 0.85rem;
   font-weight: 600;
-  font-family: var(--font-body);
 }
 
 .interp-badge.reversed {
   background: var(--ink);
-  color: var(--paper);
+  color: #f7f1e6;
 }
 
 .interp-body h4 {
@@ -913,7 +913,7 @@ section > p {
   display: block;
   margin: 0 auto 1.5rem;
   border-radius: 12px;
-  border: 2px solid rgba(192,132,252,0.4);
+  border: 1px solid rgba(18, 16, 14, 0.25);
 }
 
 .modal-body h2 {
@@ -1084,6 +1084,16 @@ footer {
   .tarot-card.fan-card {
     width: 54px;
     height: 84px;
+  }
+
+  .tarot-card.fan-card .card-name {
+    font-size: 0.42rem;
+    padding: 0.2rem 0.25rem;
+  }
+
+  .tarot-card.fan-card .card-front::before,
+  .tarot-card.fan-card .card-back::before {
+    inset: 4px;
   }
 
   .fan-title {
