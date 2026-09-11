@@ -123,8 +123,6 @@ function createCardElement(cardData, index) {
       <div class="card-face card-front">
         ${imgHtml}
         <div class="card-name">${cardData.name}</div>
-        <span class="card-upright-tag">Dritta</span>
-        <span class="card-reversed-tag">Invertita</span>
       </div>
     </div>
   `;
@@ -398,8 +396,6 @@ function buildFanCard(cardData) {
       <div class="card-face card-front">
         ${imgHtml}
         <div class="card-name">${cardData.name}</div>
-        <span class="card-upright-tag">Dritta</span>
-        <span class="card-reversed-tag">Invertita</span>
       </div>
     </div>
   `;
@@ -529,7 +525,7 @@ function revealFanCard(card, cardData) {
   card.style.transitionDelay = '0ms';
   card.style.left = (W / 2 - card.offsetWidth / 2) + 'px';
   card.style.top = (H / 2 - card.offsetHeight / 2) + 'px';
-  card.style.transform = 'rotateY(720deg) scale(1.1)';
+  card.style.transform = 'rotateY(720deg) scale(2)';
   card.style.zIndex = '999';
 
   revealedFanCard = card;
@@ -569,7 +565,9 @@ function showFanResult(cardData) {
   document.getElementById('fan-result-advice').textContent = cardData.advice;
 
   result.classList.remove('hidden');
-  result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  if (revealedFanCard) {
+    revealedFanCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 }
 
 function returnFanToDeck() {
