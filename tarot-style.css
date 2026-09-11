@@ -225,16 +225,16 @@ header {
 
 .tarot-card.fan-card .card-face {
   border-width: 2px;
-  border-radius: 8px;
+  border-radius: 4px;
 }
 
 .fan-card.revealed {
   z-index: 10000 !important;
-  filter: drop-shadow(0 0 30px rgba(250, 204, 21, 0.7));
+  filter: drop-shadow(0 10px 18px rgba(18, 16, 14, 0.45));
 }
 
 .fan-card.revealed .card-front {
-  box-shadow: 0 0 40px rgba(250, 204, 21, 0.45);
+  box-shadow: none;
 }
 
 .fan-result {
@@ -482,42 +482,69 @@ section > p {
 .card-face {
   position: absolute;
   inset: 0;
-  border-radius: 12px;
+  border-radius: 4px;
   backface-visibility: hidden;
   overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(243, 236, 224, 0.35) inset,
+    0 8px 18px rgba(18, 16, 14, 0.35);
 }
 
 .card-back {
-  background: linear-gradient(135deg, #1a1040, #2d1b69);
-  border: 3px solid #c084fc;
+  background:
+    linear-gradient(135deg, #ebe3d4 0%, #f7f1e6 45%, #e4d9c4 100%);
+  border: 2px solid var(--ink);
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.card-back::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  pointer-events: none;
+  opacity: 0.85;
 }
 
 .card-back-pattern {
-  width: 90%;
-  height: 90%;
-  border: 2px solid rgba(192,132,252,0.4);
-  border-radius: 8px;
+  width: 78%;
+  height: 82%;
+  border: 1px solid rgba(18, 16, 14, 0.55);
+  border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: repeating-conic-gradient(
-    rgba(192,132,252,0.1) 0% 25%,
-    transparent 25% 50%
-  ) 50% / 20px 20px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 6px,
+      rgba(18, 16, 14, 0.06) 6px,
+      rgba(18, 16, 14, 0.06) 7px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 6px,
+      rgba(18, 16, 14, 0.06) 6px,
+      rgba(18, 16, 14, 0.06) 7px
+    );
+  position: relative;
+  z-index: 1;
 }
 
 .card-back-pattern i {
-  font-size: 2.5rem;
-  color: #c084fc;
-  opacity: 0.7;
+  font-size: 2rem;
+  color: var(--ink);
+  opacity: 0.85;
 }
 
 .card-front {
-  background: linear-gradient(180deg, #1e1145, #0d0d2b);
-  border: 3px solid #c084fc;
+  background: #f7f1e6;
+  border: 2px solid var(--ink);
   transform: rotateY(180deg);
   display: flex;
   flex-direction: column;
@@ -528,11 +555,33 @@ section > p {
   overflow: hidden;
 }
 
+.card-front::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.9;
+}
+
 .card-front .card-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 9px;
+  border-radius: 0;
+  filter:
+    grayscale(1)
+    contrast(1.55)
+    brightness(1.05)
+    sepia(0.15);
+  mix-blend-mode: multiply;
+}
+
+.card-front .card-symbol {
+  color: var(--ink);
+  font-size: 2.2rem;
 }
 
 .card-front .card-name {
@@ -540,28 +589,41 @@ section > p {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(10, 10, 26, 0.85);
-  backdrop-filter: blur(4px);
-  padding: 0.3rem 0.4rem;
-  font-size: 0.65rem;
-  color: #e0e0e0;
-  font-weight: 600;
-  line-height: 1.2;
+  background: #f7f1e6;
+  border-top: 1px solid var(--ink);
+  backdrop-filter: none;
+  padding: 0.35rem 0.45rem 0.45rem;
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  z-index: 4;
+}
+
+.card-front .card-reversed-tag,
+.card-front .card-upright-tag {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 2.1rem;
+  border-radius: 0;
+  border: 1px solid var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.12rem 0.35rem;
+  z-index: 4;
 }
 
 .card-front .card-reversed-tag {
-  position: absolute;
-  bottom: 1.6rem;
-  left: 50%;
-  transform: translateX(-50%);
   display: none;
-  background: rgba(239, 68, 68, 0.8);
-  color: #fff;
-  padding: 0.1rem 0.4rem;
-  border-radius: 6px;
-  font-size: 0.6rem;
-  font-weight: 700;
-  z-index: 2;
+  background: var(--ink);
+  color: #f7f1e6;
 }
 
 .tarot-card.reversed .card-front .card-reversed-tag {
@@ -569,17 +631,8 @@ section > p {
 }
 
 .card-front .card-upright-tag {
-  position: absolute;
-  bottom: 1.6rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(34, 197, 94, 0.8);
-  color: #fff;
-  padding: 0.1rem 0.4rem;
-  border-radius: 6px;
-  font-size: 0.6rem;
-  font-weight: 700;
-  z-index: 2;
+  background: #f7f1e6;
+  color: var(--ink);
 }
 
 .tarot-card.reversed .card-front .card-upright-tag {
